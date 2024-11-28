@@ -9,39 +9,6 @@ const StoreContextProvider = (props) => {
   const [token, setToken] = useState("");
   const url = "https://food-delivery-backend-qtrw.onrender.com";
 
-  // Add to cart
-  const addToCart = async (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    }
-    if (token) {
-      await axios.post(`${url}/api/cart/add`, { itemId }, { headers: { token } });
-    }
-  };
-
-  // Remove from cart
-  const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    if (token) {
-      await axios.post(`${url}/api/cart/remove`, { itemId }, { headers: { token } });
-    }
-  };
-
-  // Get total cart amount
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        const itemInfo = food_list.find((product) => product._id === item);
-        totalAmount += itemInfo.price * cartItems[item];
-      }
-    }
-    return totalAmount;
-  };
-
-  // Fetch food list with stock status
   const fetchFoodList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list`);
@@ -76,19 +43,38 @@ const StoreContextProvider = (props) => {
     food_list,
     cartItems,
     setCartItems,
-    addToCart,
-    removeFromCart,
-    getTotalCartAmount,
+    addToCart: async (itemId) => {
+      if (!cartItems[itemId]) {
+        setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
+      } else {
+        setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+      }
+      if (token) {
+        await axios.post(`${url}/api/cart/add`, { itemId }, { headers: { token } });
+      }
+    },
+    removeFromCart: async (itemId) => {
+      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+      if (token) {
+        await axios.post(`${url}/api/cart/remove`, { itemId }, { headers: { token } });
+      }
+    },
+    getTotalCartAmount: () => {
+      let totalAmount = 0;
+      for (const item in cartItems) {
+        if (cartItems[item] > 0) {
+          const itemInfo = food_list.find((product) => product._id === item);
+          totalAmount += itemInfo.price * cartItems[item];
+        }
+      }
+      return totalAmount;
+    },
     url,
     token,
     setToken,
   };
 
-  return (
-    <StoreContext.Provider value={contextValue}>
-      {props.children}
-    </StoreContext.Provider>
-  );
+  return <StoreContext.Provider value={contextValue}>{props.children}</StoreContext.Provider>;
 };
 
 export default StoreContextProvider;
