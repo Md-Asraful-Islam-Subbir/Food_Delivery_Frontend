@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./MyOrder.css";
-import { assets } from "../../assets/assets";
+import { assets } from "../../assets/assets"; // Adjust the path if needed
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import jsPDF from "jspdf";
-import tomatoLogo from "../../assets/logo.png"; // Import company logo
+
+// Import your company logo here
+import tomatoLogo from "../../assets/tomato-logo.png"; // Replace with the actual path to the logo
 
 const MyOrders = () => {
   const { url, token } = useContext(StoreContext);
@@ -52,30 +54,54 @@ const MyOrders = () => {
     doc.setFontSize(18);
     doc.text("Order Receipt", 105, 40, { align: "center" });
 
-    // Add issue date
-    const issueDate = new Date().toLocaleDateString();
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Issue Date: ${issueDate}`, 10, 60);
+    // Draw a black underline below the title
+    doc.setLineWidth(1);
+    doc.setDrawColor(0, 0, 0);
+    doc.line(10, 45, 200, 45); // Underline from left to right
 
-    // Order details
-    doc.setFontSize(14);
-    doc.text(`Order ID: ${order.uniqueId}`, 10, 75);
-    doc.text(`Amount: $${order.amount}.00`, 10, 85);
-    doc.text(`Status: ${order.status}`, 10, 95);
-    doc.text(`Payment: Paid`, 10, 105);
+    // Add order details in a table format
+    const orderDetails = [
+      ["Issue Date:", new Date().toLocaleDateString()],
+      ["Order ID:", order.uniqueId],
+      ["Amount:", `$${order.amount}.00`],
+      ["Status:", order.status],
+      ["Payment:", "Paid"],
+    ];
 
-    // Items list
-    doc.text("Items:", 10, 115);
-    order.items.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item.name} x ${item.quantity}`, 20, 125 + index * 10);
+    let yPosition = 55; // Start position for table
+    orderDetails.forEach((row) => {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(row[0], 10, yPosition);
+      doc.text(row[1], 80, yPosition);
+      yPosition += 10;
     });
 
-    doc.text(`Total Items: ${order.items.length}`, 10, 125 + order.items.length * 10 + 10);
+    // Add items list in table format
+    doc.text("Items:", 10, yPosition);
+    yPosition += 10;
+    order.items.forEach((item, index) => {
+      doc.text(`${index + 1}. ${item.name} x ${item.quantity}`, 20, yPosition);
+      yPosition += 10;
+    });
+    doc.text(`Total Items: ${order.items.length}`, 10, yPosition);
 
-    // Add signature placeholder
-    doc.text("Authorized Signature:", 10, 160);
-    doc.line(10, 165, 70, 165); // Signature line
+    // Draw another black underline after the table
+    yPosition += 15;
+    doc.line(10, yPosition, 200, yPosition); // Underline after the table
+
+    // Contact information
+    doc.setFontSize(10);
+    doc.text("+880-18785-07129", 10, yPosition + 10);
+    doc.text("sabbir@tomato.com", 10, yPosition + 20);
+
+    // Add default authorization signature
+    yPosition += 50; // Move further down
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "italic");
+    doc.text("Authorized By:", 10, yPosition);
+    doc.line(40, yPosition + 2, 100, yPosition + 2); // Signature line
+    doc.text("Tomato Ltd.", 10, yPosition + 10); // Company name as a placeholder for the signature
 
     // Save the PDF
     doc.save(`Order_${order.uniqueId}_Receipt.pdf`);
