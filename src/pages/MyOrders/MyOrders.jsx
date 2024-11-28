@@ -5,20 +5,18 @@ import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import jsPDF from "jspdf";
 
-// Import your company logo here
-import tomatoLogo from "../../assets/tomato-logo.png"; // Replace with the actual path to the logo
+// Import the logo (update the path if necessary)
+import tomatoLogo from "../../assets/logo.png";
 
 const MyOrders = () => {
   const { url, token } = useContext(StoreContext);
   const [data, setData] = useState([]);
 
-  // Function to generate unique random digits for Order ID
   const generateUniqueId = (baseId) => {
-    const randomDigits = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit random number
-    return baseId ? `${baseId}-${randomDigits}` : `${randomDigits}`; // Use baseId if defined, otherwise only random digits
+    const randomDigits = Math.floor(100000 + Math.random() * 900000);
+    return baseId ? `${baseId}-${randomDigits}` : `${randomDigits}`;
   };
 
-  // Fetch orders and assign unique IDs
   const fetchOrders = async () => {
     try {
       const response = await axios.post(
@@ -28,7 +26,7 @@ const MyOrders = () => {
       );
       const ordersWithUniqueIds = response.data.data.map((order) => ({
         ...order,
-        uniqueId: generateUniqueId(order.id), // Add unique ID to each order
+        uniqueId: generateUniqueId(order.id),
       }));
       setData(ordersWithUniqueIds);
     } catch (error) {
@@ -36,9 +34,11 @@ const MyOrders = () => {
     }
   };
 
-  // Generate PDF receipt for a specific order
   const generateReceipt = (order) => {
     const doc = new jsPDF();
+
+    // Initialize yPosition
+    let yPosition = 10;
 
     // Add watermark
     doc.setTextColor(200, 200, 200);
@@ -46,20 +46,28 @@ const MyOrders = () => {
     doc.text("Tomato.", 105, 150, { align: "center", opacity: 0.1 });
 
     // Add company logo
-    doc.addImage(tomatoLogo, "PNG", 10, 10, 40, 20); // Adjust position and size as needed
+    if (tomatoLogo) {
+      doc.addImage(tomatoLogo, "PNG", 10, yPosition, 40, 20); // Adjust position and size as needed
+    }
 
-    // Add title
+    // Contact details
+    yPosition += 30; // Position below the logo
+    doc.setFontSize(10);
+    doc.text("+880-18785-07129", 10, yPosition);
+    doc.text("sabbir@tomato.com", 10, yPosition + 10);
+
+    // Add title and underline
+    yPosition += 20;
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Order Receipt", 105, 40, { align: "center" });
-
-    // Draw a black underline below the title
+    doc.text("Order Receipt", 105, yPosition, { align: "center" });
     doc.setLineWidth(1);
     doc.setDrawColor(0, 0, 0);
-    doc.line(10, 45, 200, 45); // Underline from left to right
+    doc.line(10, yPosition + 5, 200, yPosition + 5);
 
-    // Add order details in a table format
+    // Order details
+    yPosition += 15;
     const orderDetails = [
       ["Issue Date:", new Date().toLocaleDateString()],
       ["Order ID:", order.uniqueId],
@@ -68,7 +76,6 @@ const MyOrders = () => {
       ["Payment:", "Paid"],
     ];
 
-    let yPosition = 55; // Start position for table
     orderDetails.forEach((row) => {
       doc.setFontSize(12);
       doc.setFont("helvetica", "normal");
@@ -77,7 +84,8 @@ const MyOrders = () => {
       yPosition += 10;
     });
 
-    // Add items list in table format
+    // Items list
+    yPosition += 10;
     doc.text("Items:", 10, yPosition);
     yPosition += 10;
     order.items.forEach((item, index) => {
@@ -86,21 +94,12 @@ const MyOrders = () => {
     });
     doc.text(`Total Items: ${order.items.length}`, 10, yPosition);
 
-    // Draw another black underline after the table
-    yPosition += 15;
-    doc.line(10, yPosition, 200, yPosition); // Underline after the table
-
-    // Contact information
-    doc.setFontSize(10);
-    doc.text("+880-18785-07129", 10, yPosition + 10);
-    doc.text("sabbir@tomato.com", 10, yPosition + 20);
-
-    // Add default authorization signature
-    yPosition += 50; // Move further down
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "italic");
+    // Authorization signature (signature-style font)
+    yPosition += 30;
+    doc.setFont("courier", "italic"); // Use "courier" for a signature-like font
+    doc.setFontSize(14);
     doc.text("Authorized By:", 10, yPosition);
-    doc.line(40, yPosition + 2, 100, yPosition + 2); // Signature line
+    doc.setFont("courier", "normal");
     doc.text("Tomato Ltd.", 10, yPosition + 10); // Company name as a placeholder for the signature
 
     // Save the PDF
