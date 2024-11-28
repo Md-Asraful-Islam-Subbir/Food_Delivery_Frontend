@@ -4,6 +4,7 @@ import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import jsPDF from "jspdf";
+import tomatoLogo from "../../assets/logo.png"; // Import company logo
 
 const MyOrders = () => {
   const { url, token } = useContext(StoreContext);
@@ -36,23 +37,45 @@ const MyOrders = () => {
   // Generate PDF receipt for a specific order
   const generateReceipt = (order) => {
     const doc = new jsPDF();
+
+    // Add watermark
+    doc.setTextColor(200, 200, 200);
+    doc.setFontSize(40);
+    doc.text("Tomato.", 105, 150, { align: "center", opacity: 0.1 });
+
+    // Add company logo
+    doc.addImage(tomatoLogo, "PNG", 10, 10, 40, 20); // Adjust position and size as needed
+
+    // Add title
+    doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Order Receipt", 20, 20);
+    doc.text("Order Receipt", 105, 40, { align: "center" });
 
+    // Add issue date
+    const issueDate = new Date().toLocaleDateString();
+    doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(14);
-    doc.text(`Order ID: ${order.uniqueId}`, 20, 40);
-    doc.text(`Amount: $${order.amount}.00`, 20, 50);
-    doc.text(`Status: ${order.status}`, 20, 60);
-    doc.text(`Payment: Paid`, 20, 70); // Added payment status
-    doc.text("Items:", 20, 80);
+    doc.text(`Issue Date: ${issueDate}`, 10, 60);
 
+    // Order details
+    doc.setFontSize(14);
+    doc.text(`Order ID: ${order.uniqueId}`, 10, 75);
+    doc.text(`Amount: $${order.amount}.00`, 10, 85);
+    doc.text(`Status: ${order.status}`, 10, 95);
+    doc.text(`Payment: Paid`, 10, 105);
+
+    // Items list
+    doc.text("Items:", 10, 115);
     order.items.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item.name} x ${item.quantity}`, 30, 90 + index * 10);
+      doc.text(`${index + 1}. ${item.name} x ${item.quantity}`, 20, 125 + index * 10);
     });
 
-    doc.text(`Total Items: ${order.items.length}`, 20, 100 + order.items.length * 10);
+    doc.text(`Total Items: ${order.items.length}`, 10, 125 + order.items.length * 10 + 10);
+
+    // Add signature placeholder
+    doc.text("Authorized Signature:", 10, 160);
+    doc.line(10, 165, 70, 165); // Signature line
 
     // Save the PDF
     doc.save(`Order_${order.uniqueId}_Receipt.pdf`);
