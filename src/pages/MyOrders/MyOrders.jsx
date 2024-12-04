@@ -10,12 +10,8 @@ import tomatoLogo from "../../assets/logo.png";
 
 const MyOrders = () => {
   const { url, token } = useContext(StoreContext);
-  const [data, setData] = useState([]);
-
-  const generateUniqueId = (baseId) => {
-    const randomDigits = Math.floor(100000 + Math.random() * 900000);
-    return baseId ? `${baseId}-${randomDigits}` : `${randomDigits}`;
-  };
+  const [orders, setOrders] = useState([]);
+  const [userData, setUserData] = useState({});
 
   const fetchOrders = async () => {
     try {
@@ -26,89 +22,135 @@ const MyOrders = () => {
       );
       const ordersWithUniqueIds = response.data.data.map((order) => ({
         ...order,
-        uniqueId: generateUniqueId(order.id),
+        uniqueId: `${order.id}-${Math.floor(100000 + Math.random() * 900000)}`,
       }));
-      setData(ordersWithUniqueIds);
+      setOrders(ordersWithUniqueIds);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   };
 
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get("http://localhost:4000/api/order/profile", {
+        headers: { token },
+      });
+      console.log(response.data)
+      setUserData(response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   const generateReceipt = (order) => {
     const doc = new jsPDF();
-
-    // Initialize yPosition
-    let yPosition = 10;
-
+  
+    // Define common styles and spacing
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    let yPosition = margin;
+  
     // Add watermark
-    doc.setTextColor(200, 200, 200);
-    doc.setFontSize(40);
-    doc.text("Tomato.", 105, 150, { align: "center", opacity: 0.1 });
-
+    doc.setTextColor(240, 240, 240);
+    doc.setFontSize(50);
+    doc.text("TOMATO", pageWidth / 2, 150, { align: "center", opacity: 0.1 });
+  
     // Add company logo
     if (tomatoLogo) {
-      doc.addImage(tomatoLogo, "PNG", 10, yPosition, 40, 20); // Adjust position and size as needed
+      doc.addImage(tomatoLogo, "PNG", margin, yPosition, 40, 20);
     }
-
-    // Contact details
-    yPosition += 30; // Position below the logo
-    doc.setFontSize(10);
-    doc.text("+880-18785-07129", 10, yPosition);
-    doc.text("sabbir@tomato.com", 10, yPosition + 10);
-
-    // Add title and underline
-    yPosition += 20;
+  
+    // Add company details
     doc.setTextColor(0, 0, 0);
-    doc.setFont("helvetica", "bold");
+    yPosition += 25;
+    doc.setFontSize(10);
+    doc.text("Tomato Ltd.", margin, yPosition);
+    doc.text("Phone: +880-18785-07129", margin, yPosition + 5);
+    doc.text("Email: sabbir@tomato.com", margin, yPosition + 10);
+    doc.text("Website: www.tomato.com", margin, yPosition + 15);
+  
+    // Add receipt title
+    yPosition += 20;
     doc.setFontSize(18);
-    doc.text("Order Receipt", 105, yPosition, { align: "center" });
-    doc.setLineWidth(1);
-    doc.setDrawColor(0, 0, 0);
-    doc.line(10, yPosition + 5, 200, yPosition + 5);
-
-    // Order details
+    doc.setFont("helvetica", "bold");
+    doc.text("Order Receipt", pageWidth / 2, yPosition, { align: "center" });
+    doc.setLineWidth(0.5);
+    doc.line(margin, yPosition + 5, pageWidth - margin, yPosition + 5);
+  
+    // Add user information
     yPosition += 15;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text("Customer Information:", margin, yPosition);
+    yPosition += 10;
+    doc.text(`Name: ${userData.data.name || "N/A"}`, margin, yPosition);
+    doc.text(`Email: ${userData.data.email || "N/A"}`, margin + 80, yPosition);
+    yPosition += 10;
+  
+    // Add order summary
+    doc.setFont("helvetica", "bold");
+    doc.text("Order Details:", margin, yPosition);
+    yPosition += 10;
     const orderDetails = [
-      ["Issue Date:", new Date().toLocaleDateString()],
       ["Order ID:", order.uniqueId],
-      ["Amount:", `$${order.amount}.00`],
+      ["Order Date:", new Date().toLocaleDateString()],
+      ["Amount Paid:", `$${order.amount}.00`],
       ["Status:", order.status],
-      ["Payment:", "Paid"],
+      ["Payment Method:", "Paid"],
     ];
-
-    orderDetails.forEach((row) => {
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "normal");
-      doc.text(row[0], 10, yPosition);
-      doc.text(row[1], 80, yPosition);
+    doc.setFont("helvetica", "normal");
+    orderDetails.forEach(([key, value]) => {
+      doc.text(key, margin, yPosition);
+      doc.text(value, margin + 80, yPosition);
       yPosition += 10;
     });
-
-    // Items list
+  
+    // Add items table
     yPosition += 10;
-    doc.text("Items:", 10, yPosition);
+    doc.setFont("helvetica", "bold");
+    doc.text("Items Purchased:", margin, yPosition);
     yPosition += 10;
+    const tableStartY = yPosition;
+    doc.setFontSize(10);
+    doc.text("No.", margin, yPosition);
+    doc.text("Item Name", margin + 20, yPosition);
+    doc.text("Quantity", margin + 100, yPosition);
+    doc.text("Price", margin + 140, yPosition);
+  
+    doc.setLineWidth(0.5);
+    doc.line(margin, yPosition + 2, pageWidth - margin, yPosition + 2);
+  
+    yPosition += 5;
+    doc.setFont("helvetica", "normal");
     order.items.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item.name} x ${item.quantity}`, 20, yPosition);
-      yPosition += 10;
+      doc.text(`${index + 1}`, margin, yPosition);
+      doc.text(item.name, margin + 20, yPosition);
+      doc.text(`${item.quantity}`, margin + 100, yPosition);
+      doc.text(`$${item.price || "0.00"}`, margin + 140, yPosition);
+      yPosition += 7;
     });
-    doc.text(`Total Items: ${order.items.length}`, 10, yPosition);
-
-    // Authorization signature (signature-style font)
-    yPosition += 30;
-    doc.setFont("courier", "italic"); // Use "courier" for a signature-like font
-    doc.setFontSize(14);
-    doc.text("Authorized By:", 10, yPosition);
-    doc.setFont("courier", "normal");
-    doc.text("Tomato Ltd.", 10, yPosition + 10); // Company name as a placeholder for the signature
-
+  
+    // Add total items and amount
+    yPosition += 10;
+    doc.text(`Total Items: ${order.items.length}`, margin, yPosition);
+    doc.text(`Total Amount: $${order.amount}.00`, margin + 100, yPosition);
+  
+    // Add footer
+    yPosition += 20;
+    doc.setFontSize(12);
+    doc.setFont("courier", "italic");
+    doc.text("Authorized By:", margin, yPosition);
+    doc.text("Tomato Ltd.", margin, yPosition + 5);
+  
     // Save the PDF
     doc.save(`Order_${order.uniqueId}_Receipt.pdf`);
   };
+  
 
   useEffect(() => {
     if (token) {
       fetchOrders();
+      fetchUserData();
     }
   }, [token]);
 
@@ -116,7 +158,7 @@ const MyOrders = () => {
     <div className="my-orders">
       <h2>My Orders</h2>
       <div className="container">
-        {data.map((order, index) => (
+        {orders.map((order, index) => (
           <div key={index} className="my-orders-order">
             <img src={assets.parcel_icon} alt="Parcel Icon" />
             <p>
