@@ -32,7 +32,7 @@ const MyOrders = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/order/profile", {
+      const response = await axios.get("https://food-delivery-backend-qtrw.onrender.com/api/order/profile", {
         headers: { token },
       });
       console.log(response.data)
