@@ -4,6 +4,7 @@ import header_img from './header_img.png'
 import banner from '../../public/banner.png'
 import banner1 from '../../public/banner1.png'
 import banner2 from '../../public/banner2.png'
+import HeaderImage from '../../public/HeaderImage.jpg'
 import search_icon from './search_icon.png'
 import menu_1 from './menu_1.png'
 import menu_2 from './menu_2.png'
@@ -67,6 +68,7 @@ export const assets = {
     logo,
     basket_icon,
     header_img,
+    HeaderImage,
     banner,
     banner1,
     banner2,
