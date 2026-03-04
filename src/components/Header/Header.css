@@ -1,7 +1,7 @@
 .header{
    height: 34vw;
     margin: 30px auto;
-    background: url('/HeaderImage.jpg') no-repeat center;
+    background: url('/banner.png') no-repeat center;
     background-size: cover;
     position: relative;
     width: 100%;
