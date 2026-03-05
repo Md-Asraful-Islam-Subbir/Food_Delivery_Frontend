@@ -34,13 +34,10 @@ const Navbar = ({ setShowLogin }) => {
          <SearchBar />
             <div className='navbar-search-icon'>
                <Link to="/cart"> <img src={assets.basket_icon} alt="" /></Link>
-               {cartQty > 0 && (
-                  <div className="cart-count">
-                     {cartQty}
-                  </div>
-               )}
-        </div>
+                <div className={getTotalCartAmount() === 0 ? "" : "dot"}>
 
+          </div>
+        </div>
         {!token ? <button onClick={() => setShowLogin(true)}>sign in</button>
           : <div className='navbar-profile'>
             <img src={assets.profile_icon} alt="" />
