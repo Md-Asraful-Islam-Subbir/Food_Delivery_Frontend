@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import './SearchResult.css'
 import { StoreContext } from '../../context/StoreContext'
 import { Link } from 'react-router-dom'
-import FoodItem from '../../Components/FoodItem/FoodItem'
+import FoodItem from '../../components/FoodItem/FoodItem'
 
 export default function SearchResult() {
 
