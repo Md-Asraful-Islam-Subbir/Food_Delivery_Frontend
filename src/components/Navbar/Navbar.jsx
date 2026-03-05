@@ -4,7 +4,7 @@ import { assets } from '../../assets/assets'
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { StoreContext } from '../../context/StoreContext';
-
+import SearchBar from './SearchBar';
 
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
