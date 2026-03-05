@@ -11,7 +11,7 @@ import MyOrders from './pages/MyOrders/MyOrders'
 import AboutPage from './pages/About/AboutPage'
 import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SearchResult from './Pages/SearchResult/SearchResult'
+import SearchResult from './pages/SearchResult/SearchResult'
 import Cursor from './GSAP/Cursor'
 
 const App = () => {
