@@ -21,8 +21,11 @@ const Navbar = ({ setShowLogin }) => {
 
   return (
     <div className='navbar'>
-      <Link to='/'><img src={assets.logo} alt="" className="logo" /></Link>
-
+      <Link to="/" className='logo'>
+        <span class="material-symbols-outlined">
+          local_dining
+        </span>
+        <span className='logo-name'>BiteByte</span></Link>
       <ul className="navbar-menu">
         <Link to='/' onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>home</Link>
         <a href='#explore-menu' onClick={() => setMenu("menu")} className={menu === "menu" ? "active" : ""}>menu</a>
@@ -31,10 +34,10 @@ const Navbar = ({ setShowLogin }) => {
       </ul>
 
       <div className="navbar-right">
-         <SearchBar />
-            <div className='navbar-search-icon'>
-               <Link to="/cart"> <img src={assets.basket_icon} alt="" /></Link>
-                <div className={getTotalCartAmount() === 0 ? "" : "dot"}>
+        <SearchBar />
+        <div className='navbar-search-icon'>
+          <Link to="/cart"> <img src={assets.basket_icon} alt="" /></Link>
+          <div className={getTotalCartAmount() === 0 ? "" : "dot"}>
 
           </div>
         </div>
