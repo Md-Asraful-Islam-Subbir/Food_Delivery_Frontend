@@ -1,14 +1,13 @@
 import React, { useContext } from 'react'
 import './SearchResult.css'
 import { StoreContext } from '../../context/StoreContext'
-import { Link } from 'react-router-dom'
 import FoodItem from '../../components/FoodItem/FoodItem'
 
 export default function SearchResult() {
 
-  const { cartItems, addToCart, searchTerm, food_list } = useContext(StoreContext)
+  const { searchTerm, food_list } = useContext(StoreContext)
 
-
+  // If no search yet
   if (!searchTerm || searchTerm.trim() === "") {
     return (
       <div className="search-result">
@@ -19,20 +18,20 @@ export default function SearchResult() {
   }
 
   const normalizedSearch = searchTerm
-  .toLowerCase()
-  .replace(/\s|-/g, "");
+    .toLowerCase()
+    .replace(/\s|-/g, "");
 
   const filteredFood = food_list.filter((item) => {
-  const name = item.name.toLowerCase();
-  const category = item.category.toLowerCase();
-  const type = item.type.toLowerCase().replace("-", ""); 
+    const name = item.name.toLowerCase().replace(/\s|-/g, "");
+    const category = item.category.toLowerCase().replace(/\s|-/g, "");
+    const type = item.type.toLowerCase().replace(/\s|-/g, "");
 
-  return (
-    name.includes(normalizedSearch) ||
-    category.includes(normalizedSearch) ||
-    type === normalizedSearch   
-  );
-});
+    return (
+      name.includes(normalizedSearch) ||
+      category.includes(normalizedSearch) ||
+      type.includes(normalizedSearch)
+    );
+  });
 
   return (
     <div className="search-result">
@@ -41,13 +40,14 @@ export default function SearchResult() {
       {filteredFood.length > 0 ? (
         <div className="search-grid">
           {filteredFood.map((item) => (
-            <FoodItem key={item._id}
+            <FoodItem
+              key={item._id}
               id={item._id}
               name={item.name}
               price={item.price}
               description={item.description}
               image={item.image}
-              type={item.type}   
+              type={item.type}
             />
           ))}
         </div>

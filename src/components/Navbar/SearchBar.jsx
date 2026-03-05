@@ -1,18 +1,20 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { MdSearch } from "react-icons/md";
 import './Navbar.css'
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
 
 export default function SearchBar() {
+
     const { setSearchTerm } = useContext(StoreContext);
     const [inputValue, setInputValue] = useState('');
     const navigate = useNavigate();
 
     const handleKey = (e) => {
         if (e.key === "Enter" && inputValue.trim() !== "") {
-            setSearchTerm(inputValue);
+            setSearchTerm(inputValue.trim());
             navigate('/search');
+            setInputValue(""); // clear input after search
         }
     }
 
