@@ -10,17 +10,26 @@ export default function SearchBar() {
     const [inputValue, setInputValue] = useState('');
     const navigate = useNavigate();
 
-    const handleKey = (e) => {
-        if (e.key === "Enter" && inputValue.trim() !== "") {
+    const handleSearch = () => {
+        if (inputValue.trim() !== "") {
             setSearchTerm(inputValue.trim());
             navigate('/search');
-            setInputValue(""); // clear input after search
+        }
+    }
+
+    const handleKey = (e) => {
+        if (e.key === "Enter") {
+            handleSearch();
         }
     }
 
     return (
         <div className="navbar-search">
-            <MdSearch className="search-icon" />
+            <MdSearch 
+                className="search-icon"
+                onClick={handleSearch}
+                style={{ cursor: "pointer" }}
+            />
             <input
                 type="text"
                 placeholder="Search dishes"

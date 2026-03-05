@@ -7,6 +7,15 @@ export default function SearchResult() {
 
   const { searchTerm, food_list } = useContext(StoreContext)
 
+  // Wait until food list loads
+  if (!food_list || food_list.length === 0) {
+    return (
+      <div className="search-result">
+        <h2>Loading...</h2>
+      </div>
+    )
+  }
+
   // If no search yet
   if (!searchTerm || searchTerm.trim() === "") {
     return (
@@ -22,9 +31,9 @@ export default function SearchResult() {
     .replace(/\s|-/g, "");
 
   const filteredFood = food_list.filter((item) => {
-    const name = item.name.toLowerCase().replace(/\s|-/g, "");
-    const category = item.category.toLowerCase().replace(/\s|-/g, "");
-    const type = item.type.toLowerCase().replace(/\s|-/g, "");
+    const name = item.name?.toLowerCase().replace(/\s|-/g, "") || "";
+    const category = item.category?.toLowerCase().replace(/\s|-/g, "") || "";
+    const type = item.type?.toLowerCase().replace(/\s|-/g, "") || "";
 
     return (
       name.includes(normalizedSearch) ||
