@@ -10,7 +10,7 @@
 
 .navbar .logo{
   font-size: 2vw;
-  color: green;
+  color: tomato;
   display: flex;
   align-items: center;
   font-family: "BBH Bogle", sans-serif;
@@ -20,7 +20,7 @@
 .logo-icon{
     width: 32px;
     height: 32px;
-    fill: #22c55e;
+    fill: tomato;
 }
 
 .navbar-menu{

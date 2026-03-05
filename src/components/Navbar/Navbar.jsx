@@ -22,10 +22,11 @@ const Navbar = ({ setShowLogin }) => {
   return (
     <div className='navbar'>
       <Link to="/" className='logo'>
-        <span class="material-symbols-outlined">
+        <span className="material-symbols-outlined">
           local_dining
         </span>
-        <span className='logo-name'>BiteByte</span></Link>
+        <span className='logo-name'>BiteByte</span>
+        </Link>
       <ul className="navbar-menu">
         <Link to='/' onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>home</Link>
         <a href='#explore-menu' onClick={() => setMenu("menu")} className={menu === "menu" ? "active" : ""}>menu</a>
