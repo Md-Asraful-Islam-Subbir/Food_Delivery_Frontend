@@ -20,7 +20,7 @@
 }
 .header-contents h2{
     font-weight: 500;
-    color: #f1b135;
+    color: tomato;
     font-size: max(4.5vw,22px);
 }
 .header-contents p{
