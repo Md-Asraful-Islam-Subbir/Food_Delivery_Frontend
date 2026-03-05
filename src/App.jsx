@@ -8,6 +8,7 @@ import Footer from './components/Footer/Footer'
 import LoginPopup from './components/LoginPopup/LoginPopup'
 import Verify from './pages/Verify/Verify'
 import MyOrders from './pages/MyOrders/MyOrders'
+import AboutPage from './Pages/About/AboutPage'
 
 const App = () => {
   const [showLogin,setShowLogin]=useState(false)
@@ -22,9 +23,17 @@ const App = () => {
   <Route path='/order' element={<PlaceOrder/>} />
   <Route path='/verify' element={<Verify/>} />
   <Route path='/myorders' element={<MyOrders/>} />
+  <Route path='/aboutus' element={<AboutPage/>}/>
 </Routes>
     </div>
     <Footer/>
+      <ToastContainer
+        position="top-right" autoClose={2000} hideProgressBar={false}  newestOnTop={false}  closeOnClick={false}  rtl={false}    pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
     </>
     
   )
